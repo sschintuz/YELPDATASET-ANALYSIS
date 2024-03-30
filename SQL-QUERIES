@@ -1,0 +1,128 @@
+-- Part 1: Yelp Dataset Profiling and Understanding
+
+-- 1. Total number of records for each table
+SELECT 'Attribute table' AS Table, COUNT(*) AS Total_Records FROM attribute
+UNION ALL
+SELECT 'Business table', COUNT(*) FROM business
+UNION ALL
+SELECT 'Category table', COUNT(*) FROM category
+UNION ALL
+SELECT 'Checkin table', COUNT(*) FROM checkin
+UNION ALL
+SELECT 'Elite_years table', COUNT(*) FROM elite_years
+UNION ALL
+SELECT 'Friend table', COUNT(*) FROM friend
+UNION ALL
+SELECT 'Hours table', COUNT(*) FROM hours
+UNION ALL
+SELECT 'Photo table', COUNT(*) FROM photo
+UNION ALL
+SELECT 'Review table', COUNT(*) FROM review
+UNION ALL
+SELECT 'Tip table', COUNT(*) FROM tip
+UNION ALL
+SELECT 'User table', COUNT(*) FROM user;
+
+-- 2. Total distinct records by primary key or foreign key for each table
+SELECT 'Business', COUNT(DISTINCT id) AS Total_Distinct_Records FROM business
+UNION ALL
+SELECT 'Hours', COUNT(DISTINCT business_id) FROM hours
+UNION ALL
+SELECT 'Category', COUNT(DISTINCT business_id) FROM category
+UNION ALL
+SELECT 'Attribute', COUNT(DISTINCT business_id) FROM attribute
+UNION ALL
+SELECT 'Review', COUNT(DISTINCT id) FROM review
+UNION ALL
+SELECT 'Checkin', COUNT(DISTINCT business_id) FROM checkin
+UNION ALL
+SELECT 'Photo', COUNT(DISTINCT id) FROM photo
+UNION ALL
+SELECT 'Tip', COUNT(DISTINCT business_id) FROM tip
+UNION ALL
+SELECT 'User', COUNT(DISTINCT id) FROM user
+UNION ALL
+SELECT 'Friend', COUNT(DISTINCT user_id) FROM friend
+UNION ALL
+SELECT 'Elite_years', COUNT(DISTINCT business_id) FROM elite_years;
+
+-- 3. Check for null values in the Users table
+SELECT CASE WHEN COUNT(*) > 0 THEN 'Yes' ELSE 'No' END AS Null_Values
+FROM user
+WHERE column_name IS NULL;
+
+-- 4. Min, max, and avg values for specific columns
+SELECT
+    'Review' AS Table,
+    MIN(stars) AS Min_Stars,
+    MAX(stars) AS Max_Stars,
+    AVG(stars) AS Avg_Stars
+FROM review
+UNION ALL
+SELECT
+    'Business' AS Table,
+    MIN(stars) AS Min_Stars,
+    MAX(stars) AS Max_Stars,
+    AVG(stars) AS Avg_Stars
+FROM business
+UNION ALL
+SELECT
+    'Tip' AS Table,
+    MIN(likes) AS Min_Likes,
+    MAX(likes) AS Max_Likes,
+    AVG(likes) AS Avg_Likes
+FROM tip
+UNION ALL
+SELECT
+    'Checkin' AS Table,
+    MIN(count) AS Min_Checkin_Count,
+    MAX(count) AS Max_Checkin_Count,
+    AVG(count) AS Avg_Checkin_Count
+FROM checkin
+UNION ALL
+SELECT
+    'User' AS Table,
+    MIN(review_count) AS Min_Review_Count,
+    MAX(review_count) AS Max_Review_Count,
+    AVG(review_count) AS Avg_Review_Count
+FROM user;
+
+-- 5. Cities with the most reviews in descending order
+SELECT city, SUM(review_count) AS Total_Reviews
+FROM business
+GROUP BY city
+ORDER BY Total_Reviews DESC;
+
+-- 6. Distribution of star ratings for businesses in specified cities
+-- Add queries for star rating distribution in other cities...
+
+-- 7. Top users based on their total number of reviews
+SELECT name, review_count
+FROM user
+ORDER BY review_count DESC
+LIMIT 3;
+
+-- 8. Analyzing the correlation between the number of reviews and the number of fans
+
+SELECT
+    fans AS 'No of fans',
+    SUM(review_count) 'Total review'
+FROM user
+GROUP BY id
+ORDER BY 2 DESC;
+
+
+-- 9. More reviews with the word "love" or "hate" in them
+SELECT
+    (SELECT COUNT(*) FROM review WHERE text LIKE '%love%') AS love_count,
+    (SELECT COUNT(*) FROM review WHERE text LIKE '%hate%') AS hate_count;
+
+-- 10. Top users with the most fans
+SELECT name, COUNT(fans) AS fans
+FROM user
+GROUP BY name
+ORDER BY fans DESC
+LIMIT 10;
+
+
+
